@@ -19,8 +19,17 @@ module.exports = {
       [
         {
           user_id: uuidv4(),
-          email: 'jhondoe@gmail.com',
-          name: 'jhon',
+          email: 'dwaynej@gmail.com',
+          name: 'The Rock',
+          phone: '12345',
+          password: await bcrypt.hash('12345678', 10),
+          createdAt: new Date(),
+          createdAt: new Date(),
+        },
+        {
+          user_id: uuidv4(),
+          email: 'srk@gmail.com',
+          name: 'ShahRukh',
           phone: '12345',
           password: await bcrypt.hash('12345678', 10),
           createdAt: new Date(),

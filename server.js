@@ -20,6 +20,18 @@ app.get("/", (req, res) => {
   res.send("Chat App");
 });
 
+app.get("/migrate", (req, res) => {
+  const db = require("./src/models");
+  db.sequelize
+    .sync({ force: false })
+    .then(() => {
+      console.log("Synced db.");
+      res.send("All database tables are now synced");
+    })
+    .catch((err) => {
+      console.log("Failed to sync db: " + err.message);
+    });
+});
 
 const start = async () => {
   try {
@@ -34,3 +46,8 @@ const start = async () => {
 };
 
 start();
+
+//Routes Import
+const authRouter = require("./src/routes/auth_route");
+const api_v = '/api/v1'
+app.use(`${api_v}/user`, authRouter);
