@@ -4,10 +4,26 @@ const express = require("express");
 const connectDB = require("./src/db/connect");
 const app = express();
 const cors = require("cors");
+app.use(express.json());
 
 const port = process.env.PORT || 8000;
 
-app.use(express.json());
+const { Server } = require("socket.io");
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+  }
+});
+
+io.on("connection", (socket) => {
+  console.log("✅ New client connected:", socket.id);
+
+  socket.on("disconnect", () => {
+    console.log("❌ Client disconnected:", socket.id);
+  });
+});
+
 
 app.use(
     cors({
@@ -37,9 +53,10 @@ const start = async () => {
   try {
     // connectDB
     await connectDB().authenticate();
-    app.listen(port, (req, res) => {
-      console.log("Server is Running")
+    server.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
     });
+    
   } catch (error) {
     console.log(error);
   }
