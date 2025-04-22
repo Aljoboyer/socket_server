@@ -31,5 +31,5 @@ const getChats = async (req, res) => {
 module.exports = {
     addMessage,
     getChats
-  };
+};
   

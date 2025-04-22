@@ -34,8 +34,8 @@ io.on("connection", (socket) => {
         msg:message,
       }
       addMessage(msgObj)
-      // io.to(targetSocketId).emit("receivePrivateMessage", msgObj);
-      io.emit("receivePrivateMessage", msgObj)
+      io.to(targetSocketId).emit("receivePrivateMessage", msgObj);
+     
     } else {
       console.log("❌ Target user not connected:", toUserId);
     }
@@ -86,7 +86,9 @@ start();
 //Routes Import
 const authRouter = require("./src/routes/auth_route");
 const MsgRouter = require("./src/routes/chat_route");
+const CommonRouter = require("./src/routes/common_route");
 
 const api_v = '/api/v1'
 app.use(`${api_v}/user`, authRouter);
 app.use(`${api_v}/chat`, MsgRouter);
+app.use(`${api_v}/common`, CommonRouter);
