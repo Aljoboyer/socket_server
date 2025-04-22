@@ -7,6 +7,7 @@ const cors = require("cors");
 app.use(express.json());
 
 const port = process.env.PORT || 8000;
+const { addMessage } = require("./src/controllers/chat/OneToOne");
 
 const { Server } = require("socket.io");
 const server = http.createServer(app);
@@ -27,12 +28,14 @@ io.on("connection", (socket) => {
   socket.on("sendPrivateMessage", ({ toUserId, fromUserId, message }) => {
     const targetSocketId = userSocketMap[toUserId];
     if (targetSocketId) {
-      io.to(targetSocketId).emit("receivePrivateMessage", {
-        toUserId,
-        fromUserId,
-        message,
-        time: new Date().getTime()
-      });
+      const msgObj = {
+        to:toUserId,
+        from:fromUserId,
+        msg:message,
+      }
+      addMessage(msgObj)
+      // io.to(targetSocketId).emit("receivePrivateMessage", msgObj);
+      io.emit("receivePrivateMessage", msgObj)
     } else {
       console.log("❌ Target user not connected:", toUserId);
     }
@@ -82,5 +85,8 @@ start();
 
 //Routes Import
 const authRouter = require("./src/routes/auth_route");
+const MsgRouter = require("./src/routes/chat_route");
+
 const api_v = '/api/v1'
 app.use(`${api_v}/user`, authRouter);
+app.use(`${api_v}/chat`, MsgRouter);
