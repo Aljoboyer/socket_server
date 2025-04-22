@@ -15,13 +15,29 @@ const io = new Server(server, {
     origin: "*",
   }
 });
+const userSocketMap = {}; // userId => socket.id
 
 io.on("connection", (socket) => {
   console.log("✅ New client connected:", socket.id);
-
-  socket.on("disconnect", () => {
-    console.log("❌ Client disconnected:", socket.id);
+  socket.on("join", ({ userId }) => {
+    userSocketMap[userId] = socket.id;
+    console.log("📌 Mapped user:", userId, "to socket:", socket.id);
   });
+
+  socket.on("sendPrivateMessage", ({ toUserId, fromUserId, message }) => {
+    const targetSocketId = userSocketMap[toUserId];
+    if (targetSocketId) {
+      io.to(targetSocketId).emit("receivePrivateMessage", {
+        toUserId,
+        fromUserId,
+        message,
+        time: new Date().getTime()
+      });
+    } else {
+      console.log("❌ Target user not connected:", toUserId);
+    }
+  });
+
 });
 
 
