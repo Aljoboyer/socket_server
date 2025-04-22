@@ -26,19 +26,13 @@ io.on("connection", (socket) => {
   });
 
   socket.on("sendPrivateMessage", ({ toUserId, fromUserId, message }) => {
-    const targetSocketId = userSocketMap[toUserId];
-    if (targetSocketId) {
-      const msgObj = {
-        to:toUserId,
-        from:fromUserId,
-        msg:message,
-      }
-      addMessage(msgObj)
-      io.to(targetSocketId).emit("receivePrivateMessage", msgObj);
-     
-    } else {
-      console.log("❌ Target user not connected:", toUserId);
+    const msgObj = {
+      to:toUserId,
+      from:fromUserId,
+      msg:message,
     }
+    addMessage(msgObj)
+    io.to(toUserId).emit("receivePrivateMessage", msgObj);
   });
 
 });
