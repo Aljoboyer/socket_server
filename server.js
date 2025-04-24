@@ -19,20 +19,29 @@ const io = new Server(server, {
 const userSocketMap = {}; // userId => socket.id
 
 io.on("connection", (socket) => {
-  console.log("✅ New client connected:", socket.id);
-  socket.on("join", ({ userId }) => {
+  const userId = socket.handshake.query.userId;
+  if (userId) {
     userSocketMap[userId] = socket.id;
     console.log("📌 Mapped user:", userId, "to socket:", socket.id);
-  });
+  }
 
   socket.on("sendPrivateMessage", ({ toUserId, fromUserId, message }) => {
+    const targetSocketId = userSocketMap[toUserId];
+
     const msgObj = {
       to:toUserId,
       from:fromUserId,
       msg:message,
     }
-    addMessage(msgObj)
-    io.to(toUserId).emit("receivePrivateMessage", msgObj);
+    // addMessage(msgObj)
+
+   if(targetSocketId){
+    
+    socket.to(targetSocketId).emit("receivePrivateMessage", msgObj); 
+   }
+   else{
+    console.log('Targated Id Not Found', targetSocketId)
+   }
   });
 
 });
