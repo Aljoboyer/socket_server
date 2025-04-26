@@ -44,6 +44,10 @@ io.on("connection", (socket) => {
    }
   });
 
+  socket.on("addcomment", (comment) => {
+    io.emit("receivedcomments", comment)
+  })
+
 });
 
 
