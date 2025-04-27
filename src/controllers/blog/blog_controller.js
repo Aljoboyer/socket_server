@@ -1,13 +1,21 @@
 const connectDB = require('../../models');
-const socket = require('../../socket/socket');
+const { getIo, userSocketMap } = require('../../socket/socket');
 const Blog = connectDB.blog;
 
 const postBlog = async (req, res) => {
-    const blogData = await Blog.create(req.body)
-    await blogData.save()
-    const io = socket.getIO();
-    
-    
+    // const blogData = await Blog.create(req.body)
+    const io = getIo();
+    const blogWriter_id = userSocketMap[req.body.writer_id]
+    console.log('writer id ==>', blogWriter_id)
+    if (blogWriter_id) {
+      io.sockets.sockets.forEach((socket) => {
+          if (socket.id !== blogWriter_id) {
+            
+              socket.emit("newBlogPosted", `${blogWriter_id} Posted New Blog`);
+          }
+      });
+  }
+
     res.json({msg: "Blog Posted Successfully"})
 }
 
