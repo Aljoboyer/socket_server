@@ -7,51 +7,12 @@ const cors = require("cors");
 app.use(express.json());
 
 const port = process.env.PORT || 8000;
-const { addMessage } = require("./src/controllers/chat/OneToOne");
 
-const { Server } = require("socket.io");
 const server = http.createServer(app);
-const io = new Server(server, {
-  cors: {
-    origin: "*",
-  }
-});
-const userSocketMap = {}; // userId => socket.id
 
-io.on("connection", (socket) => {
-  const userId = socket.handshake.query.userId;
-  
-  if (userId) {
-    userSocketMap[userId] = socket.id;
-    console.log("📌 Mapped user:", userId, "to socket:", socket.id);
-  }
-
-  socket.on("sendPrivateMessage", ({ toUserId, fromUserId, message }) => {
-    const targetSocketId = userSocketMap[toUserId];
-
-    const msgObj = {
-      to:toUserId,
-      from:fromUserId,
-      msg:message,
-    }
-    // addMessage(msgObj)
-
-   if(targetSocketId){
-    
-    socket.to(targetSocketId).emit("receivePrivateMessage", msgObj); 
-   }
-   else{
-    console.log('Targated Id Not Found', targetSocketId)
-   }
-  });
-
-  socket.on("addcomment", (comment) => {
-    io.emit("receivedcomments", comment)
-    socket.broadcast.emit("notifyuser", `${comment.commenter_id} Has commented on post`)
-  })
-
-});
-
+// 🔥 Initialize socket
+const socket = require("./src/socket/socket");
+socket.init(server);
 
 app.use(
     cors({

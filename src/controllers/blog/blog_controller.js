@@ -1,9 +1,13 @@
 const connectDB = require('../../models');
+const socket = require('../../socket/socket');
 const Blog = connectDB.blog;
 
 const postBlog = async (req, res) => {
     const blogData = await Blog.create(req.body)
-    await blogData.save() 
+    await blogData.save()
+    const io = socket.getIO();
+    
+    
     res.json({msg: "Blog Posted Successfully"})
 }
 
