@@ -20,6 +20,7 @@ const userSocketMap = {}; // userId => socket.id
 
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
+  
   if (userId) {
     userSocketMap[userId] = socket.id;
     console.log("📌 Mapped user:", userId, "to socket:", socket.id);
@@ -46,6 +47,7 @@ io.on("connection", (socket) => {
 
   socket.on("addcomment", (comment) => {
     io.emit("receivedcomments", comment)
+    socket.broadcast.emit("notifyuser", `${comment.commenter_id} Has commented on post`)
   })
 
 });
@@ -94,8 +96,10 @@ start();
 const authRouter = require("./src/routes/auth_route");
 const MsgRouter = require("./src/routes/chat_route");
 const CommonRouter = require("./src/routes/common_route");
+const blogRouter = require("./src/routes/blog_route");
 
 const api_v = '/api/v1'
 app.use(`${api_v}/user`, authRouter);
 app.use(`${api_v}/chat`, MsgRouter);
 app.use(`${api_v}/common`, CommonRouter);
+app.use(`${api_v}/blog`, blogRouter);
