@@ -1,0 +1,15 @@
+
+const onCommentNotify = (io, socket, userSocketMap) => {
+  socket.on("commentedonpost", ({ blog_writer, commenter_id, comment }) => {
+    const targetSocketId = userSocketMap[blog_writer];
+
+    if (targetSocketId) {
+      socket.to(targetSocketId).emit("notifyoncomment", `${commenter_id} Commented on your Blog`);
+    } else {
+      console.log('Target ID Not Found', targetSocketId);
+    }
+
+  });
+};
+
+module.exports = { onCommentNotify };

@@ -1,6 +1,7 @@
 const { Server } = require("socket.io");
 const { chatHandlers } = require("./handlers/ChatHandlers");
 const { commentNotifyHandlers } = require("./handlers/commentNotifyHandlers");
+const { onCommentNotify } = require("./handlers/onCommentNotify");
 
 let io;
 const userSocketMap = {}; 
@@ -23,11 +24,9 @@ const init = (server) => {
     // Register different handlers
     chatHandlers(io, socket, userSocketMap);
     commentNotifyHandlers(io, socket, userSocketMap);
-    // registerNotificationHandlers(io, socket, userSocketMap);
-
-    socket.on("disconnect", () => {
-      console.log(`❌ User disconnected: ${socket.id}`);
+    onCommentNotify(io, socket, userSocketMap)
     
+    socket.on("disconnect", () => {
       // Find and remove user from userSocketMap
       for (const userId in userSocketMap) {
         if (userSocketMap[userId] === socket.id) {
