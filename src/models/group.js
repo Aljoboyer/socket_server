@@ -21,8 +21,12 @@ module.exports = (sequelize, DataTypes) => {
     );
     
     Group.associate = (models) => {
-        const { groupmember } = models;
-        Group.belongsToMany(groupmember, { foreignKey: 'group_id' });
+        const { groupmember , users} = models;
+        Group.belongsToMany(users, {
+          foreignKey: 'group_id',
+          through: groupmember,
+          otherKey: 'user_id',
+        });
       };
 
     return Group;

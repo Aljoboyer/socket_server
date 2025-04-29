@@ -46,6 +46,13 @@ module.exports = (sequelize, DataTypes) => {
       
     }
   );
-
+  User.associate = (models) => {
+    const { groupmember , group} = models;
+    User.belongsToMany(group, {
+      foreignKey: 'user_id',
+      through: groupmember,
+      otherKey: 'group_id',
+    });
+  };
   return User;
 };
