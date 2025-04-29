@@ -58,9 +58,11 @@ const authRouter = require("./src/routes/auth_route");
 const MsgRouter = require("./src/routes/chat_route");
 const CommonRouter = require("./src/routes/common_route");
 const blogRouter = require("./src/routes/blog_route");
+const GroupRouter = require("./src/routes/group_route");
 
 const api_v = '/api/v1'
 app.use(`${api_v}/user`, authRouter);
 app.use(`${api_v}/chat`, MsgRouter);
 app.use(`${api_v}/common`, CommonRouter);
 app.use(`${api_v}/blog`, blogRouter);
+app.use(`${api_v}/group`, GroupRouter);
