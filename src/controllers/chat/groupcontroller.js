@@ -1,7 +1,8 @@
+const { Op } = require('sequelize');
 const connectDB = require('../../models'); 
-// const { group, groupmember } = connectDB;
 const Group = connectDB.group;
 const Groupmember = connectDB.groupmember;
+const Users = connectDB.users;
 
 const createGroupController = async (req, res) => {
   const { group_name, userIds } = req.body;
@@ -24,11 +25,38 @@ const createGroupController = async (req, res) => {
 };
 
 
-const getBlogs = async (req, res) => {
+const getUserGroup = async (req, res) => {
     try {
-      const allBlogs = await Blog.findAll({});
-  
-      res.json(allBlogs);
+      const userId = req.params.id;
+
+      console.log('hitted ===>', userId)
+      const finduserGroup = await Groupmember.findAll(
+        {
+          where: {user_id: userId},
+          attributes: ['group_id']
+        })
+      
+      if(finduserGroup?.length > 0){
+        const groupIds = finduserGroup.map(group => group.group_id);
+        const matchedData = await Group.findAll({
+          where: {
+            group_id: {
+              [Op.in]: groupIds
+            },
+          },
+          attributes: ["group_id", "group_name"],
+          include: {
+            model: Users,
+            attributes: ["user_id", "name"],
+          }
+        });
+        res.json(matchedData);
+
+      }
+      else{
+      res.json({msg: 'No Group Found'});
+
+      }
     } catch (error) {
       console.error("Error fetching allBlogs:", error);
       res.status(500).json({ error: "Internal Server Error" });
@@ -37,4 +65,7 @@ const getBlogs = async (req, res) => {
 
 module.exports = {
     createGroupController,
+    getUserGroup
 };
+ 
+  
