@@ -2,6 +2,7 @@ const { Server } = require("socket.io");
 const { chatHandlers } = require("./handlers/ChatHandlers");
 const { commentNotifyHandlers } = require("./handlers/commentNotifyHandlers");
 const { onCommentNotify } = require("./handlers/onCommentNotify");
+const { groupChatHandlers } = require("./handlers/groupChatHandlers");
 
 let io;
 const userSocketMap = {}; 
@@ -25,7 +26,8 @@ const init = (server) => {
     chatHandlers(io, socket, userSocketMap);
     commentNotifyHandlers(io, socket, userSocketMap);
     onCommentNotify(io, socket, userSocketMap)
-    
+    groupChatHandlers(io, socket, userSocketMap)
+
     socket.on("disconnect", () => {
       // Find and remove user from userSocketMap
       for (const userId in userSocketMap) {
