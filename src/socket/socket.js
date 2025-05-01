@@ -16,9 +16,13 @@ const init = (server) => {
 
   io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
+    socket.emit("onlineUsers", Object.keys(userSocketMap));
 
     if (userId) {
       userSocketMap[userId] = socket.id;
+
+      io.emit("userOnline", userId);
+
       console.log("📌 Mapped user:", userId, "to socket:", socket.id);
     }
 
@@ -34,6 +38,7 @@ const init = (server) => {
         if (userSocketMap[userId] === socket.id) {
           delete userSocketMap[userId];
           console.log(`🧹 Removed mapping for user: ${userId}`);
+          io.emit("userOffline", userId);
           break;
         }
       }
