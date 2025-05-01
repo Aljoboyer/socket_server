@@ -16,16 +16,19 @@ const init = (server) => {
 
   io.on("connection", (socket) => {
     const userId = socket.handshake.query.userId;
-    socket.emit("onlineUsers", Object.keys(userSocketMap));
 
     if (userId) {
       userSocketMap[userId] = socket.id;
 
       io.emit("userOnline", userId);
 
-      console.log("📌 Mapped user:", userId, "to socket:", socket.id);
+      // console.log("📌 Mapped user:", userId, "to socket:", socket.id);
     }
 
+    socket.on("onlinenow", () => {
+      
+      io.emit("onlineUsers", Object.keys(userSocketMap));
+    })
     // Register different handlers
     chatHandlers(io, socket, userSocketMap);
     commentNotifyHandlers(io, socket, userSocketMap);
@@ -37,7 +40,7 @@ const init = (server) => {
       for (const userId in userSocketMap) {
         if (userSocketMap[userId] === socket.id) {
           delete userSocketMap[userId];
-          console.log(`🧹 Removed mapping for user: ${userId}`);
+          // console.log(`🧹 Removed mapping for user: ${userId}`);
           io.emit("userOffline", userId);
           break;
         }

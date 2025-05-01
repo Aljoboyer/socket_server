@@ -29,7 +29,6 @@ const getUserGroup = async (req, res) => {
     try {
       const userId = req.params.id;
 
-      console.log('hitted ===>', userId)
       const finduserGroup = await Groupmember.findAll(
         {
           where: {user_id: userId},

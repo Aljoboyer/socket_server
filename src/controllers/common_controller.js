@@ -4,7 +4,7 @@ const { Op } = require("sequelize");
 
 const getAllActiveUser = async (req, res) => {
     const {current_user} = req.query
-    console.log("current_user ===>", current_user)
+    
     const allUsers = await User.findAll({
         where: {
             user_id: { [Op.not]: current_user }

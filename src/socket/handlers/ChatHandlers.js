@@ -9,6 +9,14 @@ const chatHandlers = (io, socket, userSocketMap) => {
       from: fromUserId,
       msg: message,
     };
+    const fromSocketId = userSocketMap[fromUserId];
+
+    if (fromSocketId) {
+      socket.emit("messageDelivered", {
+        toUserId,
+        fromUserId
+      });
+    }
 
     if (targetSocketId) {
       socket.to(targetSocketId).emit("receivePrivateMessage", msgObj);
@@ -19,6 +27,7 @@ const chatHandlers = (io, socket, userSocketMap) => {
     // Optionally save message in DB
     // addMessage(msgObj);
   });
+
   socket.on('typingon', ({toUserId, fromUserId}) => {
     const targetSocketId = userSocketMap[toUserId];
     socket.to(targetSocketId).emit("typingstatuson", {toUserId, fromUserId})
@@ -28,6 +37,17 @@ const chatHandlers = (io, socket, userSocketMap) => {
     const targetSocketId = userSocketMap[toUserId];
     socket.to(targetSocketId).emit("typingstatusoff", {toUserId, fromUserId})
   })
+
+  socket.on("messageSeen", ({fromUserId, toUserId }) => {
+    const fromSocketId = userSocketMap[fromUserId];
+    if (fromSocketId) {
+      socket.to(fromSocketId).emit("messageSeen", {
+        fromUserId,
+        toUserId
+      });
+    }
+  });
+  
 
 };
 
