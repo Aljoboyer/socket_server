@@ -1,10 +1,9 @@
 
 const groupChatHandlers = (io, socket, userSocketMap) => {
-    socket.on("join-group", ({ groupId }) => {
-        socket.join(groupId); // join the specific room
-        console.log(`📥 User ${socket.id} joined group: ${groupId}`);
-    });
-
+  socket.on("join-group", ({ groupId }) => {
+      socket.join(groupId); // join the specific room
+      console.log(`📥 User ${socket.id} joined group: ${groupId}`);
+  });
       // 2. Handle sending group message
   socket.on("group-message", ({ groupId, message, sender }) => {
     const msgData = {

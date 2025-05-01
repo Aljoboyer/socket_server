@@ -19,6 +19,16 @@ const chatHandlers = (io, socket, userSocketMap) => {
     // Optionally save message in DB
     // addMessage(msgObj);
   });
+  socket.on('typingon', ({toUserId, fromUserId}) => {
+    const targetSocketId = userSocketMap[toUserId];
+    socket.to(targetSocketId).emit("typingstatuson", {toUserId, fromUserId})
+  })
+
+  socket.on('typingoff', ({toUserId, fromUserId}) => {
+    const targetSocketId = userSocketMap[toUserId];
+    socket.to(targetSocketId).emit("typingstatusoff", {toUserId, fromUserId})
+  })
+
 };
 
 module.exports = { chatHandlers };
