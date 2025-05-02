@@ -1,8 +1,8 @@
 
-const onCommentNotify = (io, socket, userSocketMap) => {
+const specificPostCommentNotify = (io, socket, userSocketMap) => {
   socket.on("commentedonpost", ({ blog_writer, commenter_id, commentText , blog_id}) => {
     const targetSocketId = userSocketMap[blog_writer];
-
+    
     socket.broadcast.emit('commentadded', {blog_writer, commenter_id, commentText, blog_id})
     if (targetSocketId) {
       socket.to(targetSocketId).emit("notifyoncomment", `${commenter_id} Commented on your Blog`);
@@ -13,4 +13,4 @@ const onCommentNotify = (io, socket, userSocketMap) => {
   });
 };
 
-module.exports = { onCommentNotify };
+module.exports = { specificPostCommentNotify };

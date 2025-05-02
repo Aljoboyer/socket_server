@@ -1,7 +1,7 @@
 const { Server } = require("socket.io");
 const { chatHandlers } = require("./handlers/ChatHandlers");
 const { commentNotifyHandlers } = require("./handlers/commentNotifyHandlers");
-const { onCommentNotify } = require("./handlers/onCommentNotify");
+const { specificPostCommentNotify } = require("./handlers/specificPostCommentNotify");
 const { groupChatHandlers } = require("./handlers/groupChatHandlers");
 
 let io;
@@ -32,7 +32,7 @@ const init = (server) => {
     // Register different handlers
     chatHandlers(io, socket, userSocketMap);
     commentNotifyHandlers(io, socket, userSocketMap);
-    onCommentNotify(io, socket, userSocketMap)
+    specificPostCommentNotify(io, socket, userSocketMap)
     groupChatHandlers(io, socket, userSocketMap)
 
     socket.on("disconnect", () => {

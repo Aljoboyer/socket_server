@@ -39,9 +39,10 @@ const chatHandlers = (io, socket, userSocketMap) => {
   })
 
   socket.on("messageSeen", ({fromUserId, toUserId }) => {
-    const fromSocketId = userSocketMap[fromUserId];
-    if (fromSocketId) {
-      socket.to(fromSocketId).emit("messageSeen", {
+    const toSocketId = userSocketMap[toUserId];
+    if (toSocketId) {
+    console.log('seen triggered', fromUserId, toUserId)
+      socket.to(toSocketId).emit("messageSeenReceived", {
         fromUserId,
         toUserId
       });
