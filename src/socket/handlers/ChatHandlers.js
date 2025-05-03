@@ -1,4 +1,5 @@
 const { addMessage } = require("../../controllers/chat/OneToOne");
+const currentChatMap = {}; 
 
 const chatHandlers = (io, socket, userSocketMap) => {
   socket.on("sendPrivateMessage", ({ toUserId, fromUserId, message }) => {
@@ -9,20 +10,29 @@ const chatHandlers = (io, socket, userSocketMap) => {
       from: fromUserId,
       msg: message,
     };
-    const fromSocketId = userSocketMap[fromUserId];
 
-    if (fromSocketId) {
-      socket.emit("messageDelivered", {
-        toUserId,
-        fromUserId
-      });
-    }
 
     if (targetSocketId) {
       socket.to(targetSocketId).emit("receivePrivateMessage", msgObj);
     } else {
       console.log('Target ID Not Found', targetSocketId);
     }
+
+// ---------------Msg status tracking--------------//
+      const fromSocketId = userSocketMap[fromUserId];
+        console.log('currentChat ===>', currentChatMap)
+
+        if (currentChatMap[toUserId] === fromUserId) {
+          // Mark as SEEN
+          io.to(fromSocketId).emit("messageSeenReceived", {
+            status: "seen",
+          });
+        } else {
+          // Mark as DELIVERED
+          io.to(fromSocketId).emit("messageDelivered", {
+            status: "delivered",
+          });
+        }
 
     // Optionally save message in DB
     // addMessage(msgObj);
@@ -39,16 +49,38 @@ const chatHandlers = (io, socket, userSocketMap) => {
   })
 
   socket.on("messageSeen", ({fromUserId, toUserId }) => {
-    const toSocketId = userSocketMap[toUserId];
-    if (toSocketId) {
-    console.log('seen triggered', fromUserId, toUserId)
-      socket.to(toSocketId).emit("messageSeenReceived", {
-        fromUserId,
-        toUserId
-      });
-    }
+   
   });
-  
+
+// -------------For handling message seen/delivered status----------//
+    socket.on("chatOpened", ({ toUserId, fromUserId }) => {
+      
+        if(currentChatMap[fromUserId] === toUserId){
+          const toSocketId = userSocketMap[toUserId];
+          if (toSocketId) {
+            socket.to(toSocketId).emit("messageSeenReceived", {
+              fromUserId,
+              toUserId
+            });
+          }
+        }
+        else{
+          currentChatMap[fromUserId] = toUserId;
+          const toSocketId = userSocketMap[toUserId];
+          if (toSocketId) {
+            socket.to(toSocketId).emit("messageSeenReceived", {
+              fromUserId,
+              toUserId
+            });
+          }
+        }
+        
+
+    });
+
+    socket.on("chatClosed", ({ fromUserId }) => {
+      delete currentChatMap[fromUserId];
+    });        
 
 };
 
